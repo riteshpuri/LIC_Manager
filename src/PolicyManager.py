@@ -22,18 +22,32 @@ class Main(QtWidgets.QDialog):
         super().__init__()
         self.ui = uic.loadUi(LOCAL_DIR + "/LIC_Manager.ui", self)
         self.closeBtn.clicked.connect(close_cliked)
+
+        # Add Policy Tab
         self.addPolicyBtn.clicked.connect(self.add_policy)
+        self.paidDateEdit.editingFinished.connect(self.due_date_change)
+
+        # Search Policy Tab
         self.searchBtn.clicked.connect(self.search_policy)
-        self.updateBtn.clicked.connect(self.update_payment)
-        self.updateBtn.setEnabled(False)
         self.search_all.stateChanged.connect(self.state_changed)
         self.lb_update.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.lb_InvalidSearch.hide()
+
+        # Update Payment Tab
         self.btn_PaySearch.clicked.connect(self.pay_details)
-        self.paidDateEdit.editingFinished.connect(self.due_date_change)
+        self.updateBtn.clicked.connect(self.update_payment)
+        self.updateBtn.setEnabled(False)
+
+        # Payment Due Tab
+        self.getDueBtn.clicked.connect(self.get_payment_due)
+        str_date = datetime.datetime.today().strftime('%d/%m/%Y')
+        self.date_today.setText(str('Date: {}'.format(str_date)))
+        self.dueTillDtBtn.setText(str('Get All Policies Due till Today : {}'.format(str_date)))
+
+        # Load All Policies
         self.policy_dict = {}
         self.policies_df = self.load_policies()
-        print(tabulate(self.policies_df))
-        self.lb_InvalidSearch.hide()
+        # print(tabulate(self.policies_df))
         self.show()
 
     def get_frequency(self, mode):
@@ -282,6 +296,9 @@ class Main(QtWidgets.QDialog):
             msgBox.setWindowTitle('Invalid Payment Date or Amount')
             msgBox.setText('<b>Please enter valid Payment Date and Amount .</b> <br><br> Payment date should be after 01/01/2020. <br> Amount should be greater than 0')
             msgBox.exec()
+
+    def get_payment_due(self):
+        pass
 
 
 if __name__ == '__main__':

@@ -1501,76 +1501,72 @@ border-top-color: rgb(0, 170, 0);</string>
      </layout>
     </widget>
    </widget>
-   <widget class="QWidget" name="searchTab">
-    <property name="toolTip">
-     <string>Search Policies</string>
-    </property>
+   <widget class="QWidget" name="dueTab">
     <attribute name="title">
-     <string>Search Policy</string>
+     <string>Due For Payment </string>
     </attribute>
-    <widget class="QWidget" name="widget" native="true">
+    <attribute name="toolTip">
+     <string>Polices Due For Payment</string>
+    </attribute>
+    <widget class="QWidget" name="wd_payment_due" native="true">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>10</x>
        <y>10</y>
-       <width>951</width>
-       <height>531</height>
+       <width>931</width>
+       <height>511</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(227, 211, 215)</string>
+      <string notr="true">background-color: rgb(220, 210, 220)</string>
      </property>
-     <widget class="QLabel" name="lb_policySearch">
+     <widget class="QTableWidget" name="tw_payment_due">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>50</y>
-        <width>121</width>
-        <height>21</height>
+        <x>0</x>
+        <y>110</y>
+        <width>951</width>
+        <height>421</height>
        </rect>
-      </property>
-      <property name="toolTipDuration">
-       <number>1</number>
-      </property>
-      <property name="text">
-       <string>Policy Number :</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="le_policy">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>40</y>
-        <width>261</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="toolTipDuration">
-       <number>1</number>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255)</string>
+       <string notr="true">border-color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0 rgba(0, 0, 0, 255), stop:0.373979 rgba(255, 255, 255, 255), stop:0.373991 rgba(33, 30, 255, 255), stop:0.624018 rgba(33, 30, 255, 255), stop:0.624043 rgba(255, 0, 0, 255), stop:1 rgba(255, 0, 0, 255));
+selection-background-color:rgb(255, 255, 255);
+background-color: rgb(150, 220, 190)</string>
       </property>
      </widget>
-     <widget class="QTableWidget" name="tw_policies">
+     <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>100</y>
-        <width>911</width>
-        <height>380</height>
+        <x>269</x>
+        <y>10</y>
+        <width>331</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(250, 230, 200);</string>
+      </property>
+      <property name="text">
+       <string>Find Policies Due For Payment</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="Line" name="line_5">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>90</y>
+        <width>941</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="minimumSize">
        <size>
-        <width>911</width>
-        <height>380</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>911</width>
-        <height>380</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="font">
@@ -1582,96 +1578,200 @@ border-top-color: rgb(0, 170, 0);</string>
         <bold>false</bold>
        </font>
       </property>
-      <property name="mouseTracking">
-       <bool>false</bool>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <property name="toolTip">
-       <string>Check to search all policies</string>
-      </property>
-      <property name="toolTipDuration">
-       <number>5</number>
-      </property>
-      <property name="autoFillBackground">
-       <bool>true</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0 rgba(0, 0, 0, 255), stop:0.373979 rgba(255, 255, 255, 255), stop:0.373991 rgba(33, 30, 255, 255), stop:0.624018 rgba(33, 30, 255, 255), stop:0.624043 rgba(255, 0, 0, 255), stop:1 rgba(255, 0, 0, 255));
-selection-background-color:rgb(255, 255, 255);
-background-color: rgb(110, 220, 200)</string>
-      </property>
-      <property name="textElideMode">
-       <enum>Qt::ElideMiddle</enum>
-      </property>
-      <property name="gridStyle">
-       <enum>Qt::SolidLine</enum>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
-      </property>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>140</number>
-      </attribute>
      </widget>
-     <widget class="QPushButton" name="searchBtn">
+     <widget class="QRadioButton" name="rb_thirtydays">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>40</y>
+        <x>110</x>
+        <y>61</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Next 30 Days</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Due In :</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="rb_nintydays">
+      <property name="geometry">
+       <rect>
+        <x>259</x>
+        <y>61</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Next 90 Days</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="rb_sixmonths">
+      <property name="geometry">
+       <rect>
+        <x>409</x>
+        <y>60</y>
+        <width>141</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Next 6 Months</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="rb_oneyear">
+      <property name="geometry">
+       <rect>
+        <x>569</x>
+        <y>61</y>
+        <width>121</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Next 1 year</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_6">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>48</y>
+        <width>3</width>
+        <height>48</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_7">
+      <property name="geometry">
+       <rect>
+        <x>243</x>
+        <y>48</y>
+        <width>3</width>
+        <height>48</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_8">
+      <property name="geometry">
+       <rect>
+        <x>394</x>
+        <y>48</y>
+        <width>3</width>
+        <height>48</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_9">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>48</y>
+        <width>3</width>
+        <height>48</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_10">
+      <property name="geometry">
+       <rect>
+        <x>700</x>
+        <y>50</y>
+        <width>3</width>
+        <height>48</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="getDueBtn">
+      <property name="geometry">
+       <rect>
+        <x>718</x>
+        <y>55</y>
         <width>171</width>
-        <height>41</height>
+        <height>35</height>
        </rect>
-      </property>
-      <property name="toolTipDuration">
-       <number>1</number>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color:rgb(255, 0, 127)</string>
+       <string notr="true">background-color: rgb(255, 255, 255)</string>
       </property>
       <property name="text">
-       <string>Search Policy</string>
+       <string>Get Due Policies</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../resources/find.png</normaloff>../resources/find.png</iconset>
       </property>
      </widget>
-     <widget class="QLabel" name="lb_InvalidSearch">
+     <widget class="QLabel" name="date_today">
       <property name="geometry">
        <rect>
-        <x>240</x>
-        <y>240</y>
-        <width>481</width>
-        <height>51</height>
+        <x>10</x>
+        <y>10</y>
+        <width>150</width>
+        <height>31</height>
        </rect>
       </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255)</string>
+      </property>
       <property name="text">
-       <string>           Invalid policy number. Please check pocily number</string>
+       <string>Today</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QCheckBox" name="search_all">
+     <widget class="QPushButton" name="dueTillDtBtn">
       <property name="geometry">
        <rect>
-        <x>650</x>
-        <y>40</y>
-        <width>191</width>
-        <height>41</height>
+        <x>630</x>
+        <y>10</y>
+        <width>291</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
        <string notr="true">background-color:rgb(250, 250, 250)</string>
       </property>
       <property name="text">
-       <string> Search ALL Policies</string>
+       <string>Get All Policies Due till Today</string>
       </property>
-      <property name="tristate">
-       <bool>false</bool>
+      <property name="icon">
+       <iconset>
+        <normaloff>../resources/find.png</normaloff>../resources/find.png</iconset>
       </property>
      </widget>
     </widget>
-   </widget>
-   <widget class="QWidget" name="dueTab">
-    <attribute name="title">
-     <string>Payment Due </string>
-    </attribute>
-    <attribute name="toolTip">
-     <string>Polices Due For Payment</string>
-    </attribute>
    </widget>
    <widget class="QWidget" name="payTab">
     <property name="toolTip">
@@ -2221,6 +2321,170 @@ background-color: rgb(110, 220, 200)</string>
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="searchTab">
+    <property name="toolTip">
+     <string>Search Policies</string>
+    </property>
+    <attribute name="title">
+     <string>Search Policy</string>
+    </attribute>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>10</y>
+       <width>951</width>
+       <height>531</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(227, 211, 215)</string>
+     </property>
+     <widget class="QLabel" name="lb_policySearch">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>50</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTipDuration">
+       <number>1</number>
+      </property>
+      <property name="text">
+       <string>Policy Number :</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="le_policy">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>40</y>
+        <width>261</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="toolTipDuration">
+       <number>1</number>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 255, 255)</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tw_policies">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>100</y>
+        <width>911</width>
+        <height>380</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>911</width>
+        <height>380</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>911</width>
+        <height>380</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>MS Shell Dlg 2 12</family>
+        <pointsize>10</pointsize>
+        <weight>9</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="toolTip">
+       <string>Check to search all policies</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>5</number>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0 rgba(0, 0, 0, 255), stop:0.373979 rgba(255, 255, 255, 255), stop:0.373991 rgba(33, 30, 255, 255), stop:0.624018 rgba(33, 30, 255, 255), stop:0.624043 rgba(255, 0, 0, 255), stop:1 rgba(255, 0, 0, 255));
+selection-background-color:rgb(255, 255, 255);
+background-color: rgb(110, 220, 200)</string>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideMiddle</enum>
+      </property>
+      <property name="gridStyle">
+       <enum>Qt::SolidLine</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>140</number>
+      </attribute>
+     </widget>
+     <widget class="QPushButton" name="searchBtn">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>40</y>
+        <width>171</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="toolTipDuration">
+       <number>1</number>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(255, 0, 127)</string>
+      </property>
+      <property name="text">
+       <string>Search Policy</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lb_InvalidSearch">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>240</y>
+        <width>481</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>           Invalid policy number. Please check pocily number</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="search_all">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>40</y>
+        <width>191</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(250, 250, 250)</string>
+      </property>
+      <property name="text">
+       <string> Search ALL Policies</string>
+      </property>
+      <property name="tristate">
+       <bool>false</bool>
+      </property>
      </widget>
     </widget>
    </widget>
