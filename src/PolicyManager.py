@@ -26,6 +26,7 @@ class Main(QtWidgets.QDialog):
         self.searchBtn.clicked.connect(self.search_policy)
         self.updateBtn.clicked.connect(self.update_payment)
         self.updateBtn.setEnabled(False)
+        self.search_all.stateChanged.connect(self.state_changed)
         self.lb_update.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.btn_PaySearch.clicked.connect(self.pay_details)
         self.paidDateEdit.editingFinished.connect(self.due_date_change)
@@ -100,13 +101,23 @@ class Main(QtWidgets.QDialog):
             msg_box_failed.setText('<b>Failed to add policy.</b>.')
             msg_box_failed.exec()
 
+    def state_changed(self):
+        self.tw_policies.clearContents()
+        self.tw_policies.setRowCount(0)
+        if self.search_all.isChecked():
+            self.le_policy.setEnabled(False)
+        else:
+            self.le_policy.setEnabled(True)
+
     def search_policy(self):
+        is_all_search = False
         result_df = self.policies_df
         if self.search_all.isChecked():
             print('Search all policies is enabled')
             self.le_policy.setEnabled(False)
-            # result_df = self.policies_df
+            is_all_search = True
         else:
+            is_all_search = False
             print('Search specific policies is enabled')
             self.le_policy.setEnabled(True)
             policy_number = str(self.le_policy.text()).strip()
@@ -133,55 +144,68 @@ class Main(QtWidgets.QDialog):
         for index, row in result_df.iterrows():
             list_item = []
 
-            item_number = QtWidgets.QTableWidgetItem(row['Number'])
-            item_number.setToolTip(row['Number'])
+            item_number = QtWidgets.QTableWidgetItem(str(row['Number']))
+            if not is_all_search:
+                item_number.setToolTip(row['Number'])
             list_item.append(item_number)
 
             item_name = QtWidgets.QTableWidgetItem(row['Name'])
-            item_name.setToolTip('Name: ' + row['Name'])
+            if not is_all_search:
+                item_name.setToolTip('Name: ' + row['Name'])
             list_item.append(item_name)
 
             item_doc = QtWidgets.QTableWidgetItem(row['DOC'])
-            item_doc.setToolTip('Date of Commencement: ' + row['DOC'])
+            if not is_all_search:
+                item_doc.setToolTip('Date of Commencement: ' + row['DOC'])
             list_item.append(item_doc)
 
             item_sa = QtWidgets.QTableWidgetItem(str(row['SA']))
-            item_sa.setToolTip('Sum Assured: ' + str(row['SA']))
+            if not is_all_search:
+                item_sa.setToolTip('Sum Assured: ' + str(row['SA']))
             list_item.append(item_sa)
 
             item_term = QtWidgets.QTableWidgetItem(str(row['Term']))
-            item_term.setToolTip('Term: ' + str(row['Term']))
+            if not is_all_search:
+                item_term.setToolTip('Term: ' + str(row['Term']))
             list_item.append(item_term)
 
             item_freq = QtWidgets.QTableWidgetItem(row['Mode'])
-            item_freq.setToolTip('Frequency: ' + row['Mode'])
+            if not is_all_search:
+                item_freq.setToolTip('Frequency: ' + row['Mode'])
             list_item.append(item_freq)
 
             item_premium = QtWidgets.QTableWidgetItem(str(row['Premium']))
-            item_premium.setToolTip('Premium Amount: ' + str(row['Premium']))
+            if not is_all_search:
+                item_premium.setToolTip('Premium Amount: ' + str(row['Premium']))
             list_item.append(item_premium)
 
             item_prem_dt = QtWidgets.QTableWidgetItem(row['LastPrePayDate'])
-            item_prem_dt.setToolTip('Last Premium Paid / Due Date: ' + row['LastPrePayDate'])
+            if not is_all_search:
+                item_prem_dt.setToolTip('Last Premium Paid / Due Date: ' + row['LastPrePayDate'])
             list_item.append(item_prem_dt)
 
             item_pay_dt = QtWidgets.QTableWidgetItem(row['NextPrePayDueDt'])
-            item_pay_dt.setToolTip('Next Premium Due Date: ' + row['NextPrePayDueDt'])
+            if not is_all_search:
+                item_pay_dt.setToolTip('Next Premium Due Date: ' + row['NextPrePayDueDt'])
             list_item.append(item_pay_dt)
 
             item_dom = QtWidgets.QTableWidgetItem(row['DOM'])
-            item_dom.setToolTip('Date of Maturity: ' + row['DOM'])
+            if not is_all_search:
+                item_dom.setToolTip('Date of Maturity: ' + row['DOM'])
             list_item.append(item_dom)
 
             item_lstpaydt = QtWidgets.QTableWidgetItem(str(row['LastPaymentDate']))
-            item_lstpaydt.setToolTip('Last Payment Date: ' + str(row['LastPaymentDate']))
+            if not is_all_search:
+                item_lstpaydt.setToolTip('Last Payment Date: ' + str(row['LastPaymentDate']))
             list_item.append(item_lstpaydt)
 
             item_amt = QtWidgets.QTableWidgetItem(str(row['Amount']))
-            item_amt.setToolTip('Amount:' + str(row['Amount']))
+            if not is_all_search:
+                item_amt.setToolTip('Amount:' + str(row['Amount']))
             list_item.append(item_amt)
 
             parent_items.append(list_item)
+            # print('appended successfully row for index : {}'.format(index))
             # item_index = 0
             # for item in list_item:
             #     item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
@@ -193,6 +217,7 @@ class Main(QtWidgets.QDialog):
         for list_item in parent_items:
             item_index = 0
             for item in list_item:
+                # print('item : {}'.format(item))
                 item.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
                 item.setBackground(QtGui.QColor(255, 255, 255))
                 self.tw_policies.setItem(index, item_index, item)
@@ -204,8 +229,6 @@ class Main(QtWidgets.QDialog):
     def pay_details(self):
         policy_number = str(self.le_pay_policy_search.text()).strip()
         df_search = self.policies_df
-        # results = df_search["Number"][0]
-        # print('new df : {} - {}'.format(results, type(results)))
         df_search['Number'] = df_search['Number'].astype("string")
         result_df = df_search.loc[df_search['Number'] == policy_number]
         result_df.reset_index(drop=True, inplace=True)
