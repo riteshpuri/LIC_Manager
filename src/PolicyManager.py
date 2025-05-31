@@ -5,7 +5,7 @@ import datetime as datetime
 from tabulate import tabulate
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 from dateutil.relativedelta import relativedelta
-from InsuranceManager.src.AddPolicy import AddPolicy
+from AddPolicy import AddPolicy
 
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -26,6 +26,7 @@ class Main(QtWidgets.QDialog):
         # Add Policy Tab
         self.addPolicyBtn.clicked.connect(self.add_policy)
         self.paidDateEdit.editingFinished.connect(self.due_date_change)
+        self.nextPremiumDateEdit.setDate(datetime.datetime.today())
 
         # Search Policy Tab
         self.searchBtn.clicked.connect(self.search_policy)
@@ -34,15 +35,18 @@ class Main(QtWidgets.QDialog):
         self.lb_InvalidSearch.hide()
 
         # Update Payment Tab
+        self.de_paymentDt.setDate(datetime.datetime.today())
         self.btn_PaySearch.clicked.connect(self.pay_details)
         self.updateBtn.clicked.connect(self.update_payment)
         self.updateBtn.setEnabled(False)
 
+
         # Payment Due Tab
         self.getDueBtn.clicked.connect(self.get_payment_due)
-        str_date = datetime.datetime.today().strftime('%d/%m/%Y')
-        self.date_today.setText(str('Date: {}'.format(str_date)))
-        self.dueTillDtBtn.setText(str('Get All Policies Due till Today : {}'.format(str_date)))
+        self.str_date = datetime.datetime.today().strftime('%d/%m/%Y')
+        self.date_today.setText(str('Date: {}'.format(self.str_date)))
+        self.dueTillDtBtn.setText(str('Get All Policies Due till Today : {}'.format(self.str_date)))
+        self.dueTillDtBtn.clicked.connect(self.get_payment_due_till_dt)
 
         # Load All Policies
         self.policy_dict = {}
@@ -83,6 +87,7 @@ class Main(QtWidgets.QDialog):
 
         freq = self.get_frequency(self.freqComboBox.currentText())
         nextPremDue = self.paidDateEdit.date().toPyDate() + relativedelta(months=freq)
+        print('next premium date : {}'.format(nextPremDue))
         self.nextPremiumDateEdit.setDate(nextPremDue)
 
         self.policy_dict = {'Number': self.numberLineEdit.text(), 'Name': self.nameComboBox.currentText(),
@@ -125,7 +130,7 @@ class Main(QtWidgets.QDialog):
 
     def search_policy(self):
         is_all_search = False
-        result_df = self.policies_df
+        result_df = self.policies_df.copy(deep=True)
         if self.search_all.isChecked():
             print('Search all policies is enabled')
             self.le_policy.setEnabled(False)
@@ -136,7 +141,7 @@ class Main(QtWidgets.QDialog):
             self.le_policy.setEnabled(True)
             policy_number = str(self.le_policy.text()).strip()
             print('policy number {} - {}'.format(policy_number, type(policy_number)))
-            df_search = self.policies_df
+            df_search = self.policies_df.copy(deep=True)
             df_search['Number'] = df_search['Number'].astype("string")
             result_df = df_search.loc[df_search['Number'] == policy_number]
 
@@ -144,7 +149,6 @@ class Main(QtWidgets.QDialog):
 
         if len(result_df) > 0:
             self.lb_InvalidSearch.hide()
-            # print('===========================================================')
             print(result_df.columns.values.tolist())
             print('searched result : {}'.format(result_df))
 
@@ -238,11 +242,12 @@ class Main(QtWidgets.QDialog):
                 item_index += 1
             index += 1
 
+        self.tw_policies.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.tw_policies.show()
 
     def pay_details(self):
         policy_number = str(self.le_pay_policy_search.text()).strip()
-        df_search = self.policies_df
+        df_search = self.policies_df.copy(deep=True)
         df_search['Number'] = df_search['Number'].astype("string")
         result_df = df_search.loc[df_search['Number'] == policy_number]
         result_df.reset_index(drop=True, inplace=True)
@@ -297,8 +302,134 @@ class Main(QtWidgets.QDialog):
             msgBox.setText('<b>Please enter valid Payment Date and Amount .</b> <br><br> Payment date should be after 01/01/2020. <br> Amount should be greater than 0')
             msgBox.exec()
 
+    def populate_tw_payment_due(self, rslt_df):
+        print(rslt_df)
+        if len(rslt_df) > 0:
+            print(rslt_df.columns.values.tolist())
+            print('searched result : {}'.format(rslt_df))
+
+            self.tw_payment_due.setRowCount(len(rslt_df))
+            self.tw_payment_due.setColumnCount(len(rslt_df.columns.values.tolist()))
+            self.tw_payment_due.setHorizontalHeaderLabels(rslt_df.columns.values.tolist())
+            self.tw_payment_due.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+            parent_items = []
+            for index, row in rslt_df.iterrows():
+                print(row)
+                next_prem_due_dt = str(str(row['NextPrePayDueDt']).split(" ")[0])
+                list_item = []
+
+                items_number = QtWidgets.QTableWidgetItem(str(row['Number']))
+                list_item.append(items_number)
+
+                items_name = QtWidgets.QTableWidgetItem(row['Name'])
+                list_item.append(items_name)
+
+                items_doc = QtWidgets.QTableWidgetItem(row['DOC'])
+                list_item.append(items_doc)
+
+                items_sa = QtWidgets.QTableWidgetItem(str(row['SA']))
+                list_item.append(items_sa)
+
+                items_term = QtWidgets.QTableWidgetItem(str(row['Term']))
+                list_item.append(items_term)
+
+                items_freq = QtWidgets.QTableWidgetItem(row['Mode'])
+                list_item.append(items_freq)
+
+                items_premium = QtWidgets.QTableWidgetItem(str(row['Premium']))
+                list_item.append(items_premium)
+
+                items_prem_dt = QtWidgets.QTableWidgetItem(row['LastPrePayDate'])
+                list_item.append(items_prem_dt)
+
+                items_pay_dt = QtWidgets.QTableWidgetItem(next_prem_due_dt)
+                list_item.append(items_pay_dt)
+
+                items_dom = QtWidgets.QTableWidgetItem(row['DOM'])
+                list_item.append(items_dom)
+
+                items_lstpaydt = QtWidgets.QTableWidgetItem(str(row['LastPaymentDate']))
+                list_item.append(items_lstpaydt)
+
+                items_amt = QtWidgets.QTableWidgetItem(str(row['Amount']))
+                list_item.append(items_amt)
+
+                parent_items.append(list_item)
+
+            indexs = 0
+            for list_item in parent_items:
+                items_index = 0
+                for items in list_item:
+                    # print('item : {}'.format(item))
+                    items.setTextAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+                    items.setBackground(QtGui.QColor(255, 255, 255))
+                    self.tw_payment_due.setItem(indexs, items_index, items)
+                    items_index += 1
+                indexs += 1
+
+            self.tw_payment_due.show()
+
+        else:
+            msg_box_success = QtWidgets.QMessageBox()
+            msg_box_success.setIcon(QtWidgets.QMessageBox.Icon.Information)
+            msg_box_success.setWindowTitle('Due For Payment')
+            msg_box_success.setText('<b> No policy is due for payment. </b>')
+            msg_box_success.exec()
+
     def get_payment_due(self):
-        pass
+        self.tw_payment_due.clearContents()
+        df_policies = self.policies_df.copy(deep=True)
+        print('get payment dues {}'.format(self.str_date))
+        isThirtyDays = self.rb_thirtydays.isChecked()
+        isNintyDays = self.rb_nintydays.isChecked()
+        isSixMonths = self.rb_sixmonths.isChecked()
+        isOneYear = self.rb_oneyear.isChecked()
+        today = datetime.date.today()
+        nextDate = None
+
+        if isThirtyDays:
+            nextDate = today + relativedelta(months=+1)
+            print(nextDate)
+        elif isNintyDays:
+            nextDate = today + relativedelta(months=+3)
+            print(nextDate)
+        elif isSixMonths:
+            nextDate = today + relativedelta(months=+6)
+            print(nextDate)
+        elif isOneYear:
+            nextDate = today + relativedelta(months=+12)
+            print(nextDate)
+        else:
+            print('not selected')
+
+        # Make sure 'NextPrePayDueDt' is datetime64
+        df_policies['NextPrePayDueDt'] = pd.to_datetime(df_policies['NextPrePayDueDt'])
+
+        # Generate date range from today to nextDate (as Timestamps)
+        date_range = pd.date_range(start=today, end=nextDate)
+
+        # Filter rows where 'NextPrePayDueDt' falls within the range
+        rslt_df = df_policies[df_policies['NextPrePayDueDt'].isin(date_range)]
+        self.populate_tw_payment_due(rslt_df)
+
+        # nextDate = nextDate.strftime('%Y-%m-%d')
+        # today = today.strftime('%Y-%m-%d')
+        #
+        # df_policies['NextPrePayDueDt'] = df_policies['NextPrePayDueDt'].astype('datetime64[ns]')
+        # rslt_df = df_policies[df_policies['NextPrePayDueDt'].isin(pd.date_range(today, nextDate))]
+
+    def get_payment_due_till_dt(self):
+        print('show policies duw till date')
+        self.tw_payment_due.clearContents()
+        df_policies = self.policies_df.copy(deep=True)
+        today = datetime.date.today().strftime('%Y-%m-%d')
+
+        df_policies['NextPrePayDueDt'] = pd.to_datetime(df_policies['NextPrePayDueDt'])
+        # Filter rows where date is less than today
+        due_policies_df = df_policies[df_policies['NextPrePayDueDt'] < pd.Timestamp(today)]
+
+        self.populate_tw_payment_due(due_policies_df)
 
 
 if __name__ == '__main__':

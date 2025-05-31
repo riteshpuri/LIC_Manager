@@ -528,7 +528,7 @@ background-color:rgb(165, 202, 160);</string>
        <x>0</x>
        <y>0</y>
        <width>951</width>
-       <height>620</height>
+       <height>972</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout">
@@ -1485,7 +1485,7 @@ border-top-color: rgb(0, 170, 0);</string>
          </size>
         </property>
         <property name="text">
-         <string>Lastest Premium  Due Date :</string>
+         <string>Latest Premium  Due Date :</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -1523,17 +1523,23 @@ border-top-color: rgb(0, 170, 0);</string>
      <widget class="QTableWidget" name="tw_payment_due">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>110</y>
-        <width>951</width>
-        <height>421</height>
+        <x>10</x>
+        <y>120</y>
+        <width>911</width>
+        <height>381</height>
        </rect>
+      </property>
+      <property name="autoFillBackground">
+       <bool>true</bool>
       </property>
       <property name="styleSheet">
        <string notr="true">border-color: qconicalgradient(cx:0.5, cy:0.5, angle:0, stop:0 rgba(0, 0, 0, 255), stop:0.373979 rgba(255, 255, 255, 255), stop:0.373991 rgba(33, 30, 255, 255), stop:0.624018 rgba(33, 30, 255, 255), stop:0.624043 rgba(255, 0, 0, 255), stop:1 rgba(255, 0, 0, 255));
 selection-background-color:rgb(255, 255, 255);
 background-color: rgb(150, 220, 190)</string>
       </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>140</number>
+      </attribute>
      </widget>
      <widget class="QLabel" name="label_6">
       <property name="geometry">
