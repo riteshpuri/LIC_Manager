@@ -17,6 +17,10 @@ def close_cliked():
     print('Exiting')
     exit(0)
 
+
+def prompt_user(msg_title, msg_str, msg_type='Info'):
+    pass
+
 class Main(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
@@ -40,7 +44,6 @@ class Main(QtWidgets.QDialog):
         self.updateBtn.clicked.connect(self.update_payment)
         self.updateBtn.setEnabled(False)
 
-
         # Payment Due Tab
         self.getDueBtn.clicked.connect(self.get_payment_due)
         self.str_date = datetime.datetime.today().strftime('%d/%m/%Y')
@@ -50,16 +53,23 @@ class Main(QtWidgets.QDialog):
 
         # Load All Policies
         self.policy_dict = {}
-        self.policies_df = self.load_policies()
-        # print(tabulate(self.policies_df))
+        self.policies_df = pd.DataFrame()
+        self.policy_number_list = []
+        self.load_policies()
         self.show()
+
+    def get_all_policies_df(self):
+        return self.policies_df
 
     def get_frequency(self, mode):
         frequency = {'Monthly': 1, 'Quarterly': 3, 'Half Yearly': 6, 'Yearly': 12}
         return frequency[mode] if mode in frequency else 0
 
     def load_policies(self):
-        return pd.read_csv("../Data/polices.dat", sep='|')
+        self.policies_df = pd.read_csv("../Data/polices.dat", sep='|')
+        self.policy_number_list = self.policies_df['Number'].tolist()
+        print(self.policy_number_list)
+        print('Policies Loading Success')
 
     def due_date_change(self):
         cur_due_date = self.paidDateEdit.date().toPyDate()
@@ -79,30 +89,43 @@ class Main(QtWidgets.QDialog):
 
     def add_policy(self):
         print('add clicked')
-        print('Date : {}'.format(self.docDateEdit.date().toPyDate()))
-        print('term : {}'.format(self.termSpinBox.text()))
+        # print('Date : {}'.format(self.docDateEdit.date().toPyDate()))
+        # print('term : {}'.format(self.termSpinBox.text()))
 
         dom = self.docDateEdit.date().toPyDate() + relativedelta(years=int(self.termSpinBox.text()))
-        print('dom : {}'.format(dom))
+        # print('dom : {}'.format(dom))
 
         freq = self.get_frequency(self.freqComboBox.currentText())
         nextPremDue = self.paidDateEdit.date().toPyDate() + relativedelta(months=freq)
         print('next premium date : {}'.format(nextPremDue))
         self.nextPremiumDateEdit.setDate(nextPremDue)
 
-        self.policy_dict = {'Number': self.numberLineEdit.text(), 'Name': self.nameComboBox.currentText(),
+        number = self.numberLineEdit.text()
+        self.policy_dict = {'Number': number, 'Name': self.nameComboBox.currentText(),
                             'DOC': self.docDateEdit.date().toPyDate(), 'SA': self.sumAssuredLineEdit.text(),
                             'Term': self.termSpinBox.text(), 'Mode': self.freqComboBox.currentText(),
                             'Premium': self.premiumLineEdit.text(), 'LastPrePayDate': self.paidDateEdit.date().toPyDate(),
                             'NextPrePayDueDt': nextPremDue, 'DOM': dom, 'LastPaymentDate': 'Not Available', 'Amount': self.premiumLineEdit.text()}
 
-        if len(self.numberLineEdit.text().strip()) <= 0:
+        if len(number) <= 0:
             print('Please enter policy Number')
             msgBox = QtWidgets.QMessageBox()
-            msgBox.setIcon(QtWidgets.QMessageBox.Icon.Information)
+            msgBox.setIcon(QtWidgets.QMessageBox.Icon.Warning)
             msgBox.setWindowTitle('Policy Number')
-            msgBox.setText('<b>Please enter valid policy number.</b> <br><br> Correct Policy number is required to add policy details.')
+            msgBox.setText('<b>Please enter valid policy number.</b> <br><br> Correct policy number is required to add policy.')
             msgBox.exec()
+            return
+
+        if int(number) in self.policy_number_list:
+            print('already available')
+            msgBox1 = QtWidgets.QMessageBox()
+            msgBox1.setIcon(QtWidgets.QMessageBox.Icon.Warning)
+            msgBox1.setWindowTitle('Policy Already Added')
+            msgBox1.setText("<b>Please enter valid policy number.</b> <br><br> Already added policy cannot be add again.")
+            msgBox1.exec()
+            return
+        else:
+            print('policy not exist {}'.format(self.numberLineEdit.text().strip()))
 
         addObj = AddPolicy(self.policy_dict, self.policies_df)
 
@@ -115,7 +138,7 @@ class Main(QtWidgets.QDialog):
             self.load_policies()
         else:
             msg_box_failed = QtWidgets.QMessageBox()
-            msg_box_failed.setIcon(QtWidgets.QMessageBox.Icon.Error)
+            msg_box_failed.setIcon(QtWidgets.QMessageBox.Icon.Information)
             msg_box_failed.setWindowTitle('Add Policy')
             msg_box_failed.setText('<b>Failed to add policy.</b>.')
             msg_box_failed.exec()
@@ -281,20 +304,53 @@ class Main(QtWidgets.QDialog):
             msgBox.exec()
 
     def update_payment(self):
+        df_update_payment = self.get_all_policies_df().copy(deep=True)
+
+        # Force 'Number' column to string for accurate matching
+        df_update_payment['Number'] = df_update_payment['Number'].astype(str)
+
         policy_number = str(self.le_pay_policy_search.text()).strip()
         payment_date = self.de_paymentDt.date().toPyDate()
         dt = datetime.date(2020, 1, 1)
-        print('Updating....')
         payment_amt = self.le_paidAmount.text()
+
+        due_date_str = self.le_dueDate.text().strip()
+        due_date = datetime.datetime.strptime(due_date_str, '%Y-%m-%d')
+        min_pay_date = due_date - relativedelta(months=1)
+        print(min_pay_date)
+
+        if min_pay_date.date() > datetime.date.today():
+            msg_box_critical = QtWidgets.QMessageBox()
+            msg_box_critical.setIcon(QtWidgets.QMessageBox.Icon.Critical)
+            msg_box_critical.setWindowTitle('LIC of India - Future Due Policy')
+            msg_box_critical.setText('<b>As per LIC of India future due premium is not allowed to pay before one month'
+                                     ' from due date.</b><br><br> Pay premium after <b> {} </b> and then update'
+                                     .format(min_pay_date.strftime('%d/%m/%Y')))
+            msg_box_critical.exec()
+            return
+        else:
+            print(' Allowed payment date is on or after {}'.format(min_pay_date))
+
+        print('Updating....**')
         if payment_date > dt and len(payment_amt) > 0:
-            nextPrePayDueDt = self.le_futureDtOnUpdate.text()
-            lastPrePayDate = self.le_dueDate.text()
-            self.policies_df.loc[self.policies_df['Number'] == policy_number, 'LastPrePayDate'] = lastPrePayDate
-            self.policies_df.loc[self.policies_df['Number'] == policy_number, 'NextPrePayDueDt'] = nextPrePayDueDt
-            self.policies_df.loc[self.policies_df['Number'] == policy_number, 'LastPaymentDate'] = payment_date
-            self.policies_df.loc[self.policies_df['Number'] == policy_number, 'Amount'] = str(payment_amt)
-            print('Updated successfully')
-            self.policies_df.to_csv("../Data/polices.dat", sep='|', index=False)
+            mask = df_update_payment['Number'] == policy_number
+            if mask.any():
+                nextPrePayDueDt = self.le_futureDtOnUpdate.text().strip()
+                lastPrePayDate = self.le_dueDate.text().strip()
+
+                df_update_payment.loc[mask, 'LastPrePayDate'] = lastPrePayDate
+                df_update_payment.loc[mask, 'NextPrePayDueDt'] = nextPrePayDueDt
+                df_update_payment.loc[mask, 'LastPaymentDate'] = str(payment_date)
+                df_update_payment.loc[mask, 'Amount'] = float(payment_amt)
+
+                print("Updated Row:")
+                print(df_update_payment.loc[mask])
+
+                df_update_payment.to_csv("../Data/polices.dat", sep='|', index=False)
+                self.load_policies()
+                print("Updated successfully.")
+            else:
+                print(f"No matching policy number found: {policy_number}")
         else:
             msgBox = QtWidgets.QMessageBox()
             msgBox.setIcon(QtWidgets.QMessageBox.Icon.Warning)
