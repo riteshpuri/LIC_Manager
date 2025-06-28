@@ -19,7 +19,12 @@ def close_cliked():
 
 
 def prompt_user(msg_title, msg_str, msg_type='Info'):
-    pass
+    msgBox = QtWidgets.QMessageBox()
+    msgBox.setIcon(QtWidgets.QMessageBox.Icon.Information)
+    msgBox.setWindowTitle(msg_title)
+    msgBox.setText(msg_str)
+    msgBox.exec()
+
 
 class Main(QtWidgets.QDialog):
     def __init__(self):
@@ -349,6 +354,8 @@ class Main(QtWidgets.QDialog):
                 df_update_payment.to_csv("../Data/polices.dat", sep='|', index=False)
                 self.load_policies()
                 print("Updated successfully.")
+                msg_string = "<b>{} - Payment Updated Successfully.</b> <br><br> Next due fall on {}".format(str(policy_number), nextPrePayDueDt)
+                prompt_user(msg_title='Payment Details Updated Successfully', msg_str=msg_string)
             else:
                 print(f"No matching policy number found: {policy_number}")
         else:
@@ -362,6 +369,10 @@ class Main(QtWidgets.QDialog):
         print(rslt_df)
         if len(rslt_df) > 0:
             print(rslt_df.columns.values.tolist())
+
+            # rslt_df = rslt_df[['Number', 'Name', 'NextPrePayDueDt', 'Premium', 'Mode', 'LastPrePayDate',
+            #                    'LastPaymentDate', 'Amount', 'DOC', 'SA', 'Term', 'DOM']]
+
             print('searched result : {}'.format(rslt_df))
 
             self.tw_payment_due.setRowCount(len(rslt_df))
@@ -375,9 +386,11 @@ class Main(QtWidgets.QDialog):
                 next_prem_due_dt = str(str(row['NextPrePayDueDt']).split(" ")[0])
                 list_item = []
 
+                # Number
                 items_number = QtWidgets.QTableWidgetItem(str(row['Number']))
                 list_item.append(items_number)
 
+                # Name
                 items_name = QtWidgets.QTableWidgetItem(row['Name'])
                 list_item.append(items_name)
 
@@ -390,21 +403,26 @@ class Main(QtWidgets.QDialog):
                 items_term = QtWidgets.QTableWidgetItem(str(row['Term']))
                 list_item.append(items_term)
 
+                # Mode
                 items_freq = QtWidgets.QTableWidgetItem(row['Mode'])
                 list_item.append(items_freq)
 
+                # Premium
                 items_premium = QtWidgets.QTableWidgetItem(str(row['Premium']))
                 list_item.append(items_premium)
 
+                # LastPrePayDate
                 items_prem_dt = QtWidgets.QTableWidgetItem(row['LastPrePayDate'])
                 list_item.append(items_prem_dt)
 
+                # NextPrePayDueDt
                 items_pay_dt = QtWidgets.QTableWidgetItem(next_prem_due_dt)
                 list_item.append(items_pay_dt)
 
                 items_dom = QtWidgets.QTableWidgetItem(row['DOM'])
                 list_item.append(items_dom)
 
+                # LastPaymentDate
                 items_lstpaydt = QtWidgets.QTableWidgetItem(str(row['LastPaymentDate']))
                 list_item.append(items_lstpaydt)
 
@@ -424,8 +442,8 @@ class Main(QtWidgets.QDialog):
                     items_index += 1
                 indexs += 1
 
+            # self.reorder_table_columns()
             self.tw_payment_due.show()
-
         else:
             msg_box_success = QtWidgets.QMessageBox()
             msg_box_success.setIcon(QtWidgets.QMessageBox.Icon.Information)
