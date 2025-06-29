@@ -6,6 +6,7 @@ from tabulate import tabulate
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 from dateutil.relativedelta import relativedelta
 from AddPolicy import AddPolicy
+import matplotlib.pyplot as plt
 
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -73,7 +74,7 @@ class Main(QtWidgets.QDialog):
     def load_policies(self):
         self.policies_df = pd.read_csv("../Data/polices.dat", sep='|')
         self.policy_number_list = self.policies_df['Number'].tolist()
-        print(self.policy_number_list)
+        # print(self.policy_number_list)
         print('Policies Loading Success')
 
     def due_date_change(self):
@@ -369,10 +370,6 @@ class Main(QtWidgets.QDialog):
         print(rslt_df)
         if len(rslt_df) > 0:
             print(rslt_df.columns.values.tolist())
-
-            # rslt_df = rslt_df[['Number', 'Name', 'NextPrePayDueDt', 'Premium', 'Mode', 'LastPrePayDate',
-            #                    'LastPaymentDate', 'Amount', 'DOC', 'SA', 'Term', 'DOM']]
-
             print('searched result : {}'.format(rslt_df))
 
             self.tw_payment_due.setRowCount(len(rslt_df))
@@ -444,6 +441,8 @@ class Main(QtWidgets.QDialog):
 
             # self.reorder_table_columns()
             self.tw_payment_due.show()
+            df_generate_pdf = rslt_df[['Number', 'Name', 'NextPrePayDueDt', 'Premium', 'LastPrePayDate']].copy()
+            self.generate_pdf(df_generate_pdf)
         else:
             msg_box_success = QtWidgets.QMessageBox()
             msg_box_success.setIcon(QtWidgets.QMessageBox.Icon.Information)
@@ -504,6 +503,45 @@ class Main(QtWidgets.QDialog):
         due_policies_df = df_policies[df_policies['NextPrePayDueDt'] < pd.Timestamp(today)]
 
         self.populate_tw_payment_due(due_policies_df)
+
+    def generate_pdf(self, df_pdf):
+        # Create a figure and axes
+        df_pdf.sort_values(by='NextPrePayDueDt', ascending=True, inplace=True)
+        df_pdf['NextPrePayDueDt'] = df_pdf['NextPrePayDueDt'].dt.strftime('%Y-%m-%d')
+        df_pdf.rename(columns={'Premium': 'Premium Amount', 'NextPrePayDueDt': 'Next Due Date',
+                               'LastPrePayDate': 'Last Paid Date'}, inplace=True)
+
+        num_rows = len(df_pdf)
+        row_height = 0.5  # Adjust as needed
+        fig_height = max(2, num_rows * row_height)
+
+        fig, ax = plt.subplots(figsize=(10, fig_height)) # Adjust size as needed
+        ax.axis('off') # Hide axes
+
+        # Create a table from the DataFrame
+        table = ax.table(cellText=df_pdf.values, colLabels=df_pdf.columns, loc='center', cellLoc='center')
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1.2, 1.2) # Adjust table scale
+
+        # 🎨 Define colors
+        header_color = '#4B8BBE'  # Strong blue
+        even_row_color = '#E3F2FD'  # E3F2FD'   # Very light blue
+        odd_row_color = '#C8E6C9'   # #BBDEFB'    # Soft medium blue
+        header_text_color = 'white'
+
+        # Style table cells
+        for (row, col), cell in table.get_celld().items():
+            if row == 0:
+                cell.set_facecolor(header_color)
+                cell.set_text_props(weight='bold', color=header_text_color)
+            else:
+                cell.set_facecolor(even_row_color if row % 2 == 0 else odd_row_color)
+                cell.set_text_props(color='black')
+
+        # Save the figure as a PDF
+        plt.savefig("../Data/payment_due.pdf", bbox_inches=None)
+        plt.close(fig)
 
 
 if __name__ == '__main__':
