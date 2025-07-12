@@ -511,6 +511,19 @@ class Main(QtWidgets.QDialog):
         df_pdf.rename(columns={'Premium': 'Premium Amount', 'NextPrePayDueDt': 'Next Due Date',
                                'LastPrePayDate': 'Last Paid Date'}, inplace=True)
 
+        total_premium = df_pdf['Premium Amount'].sum()
+        print('total premium : {}'.format(total_premium))
+
+        # Create a new row (as a dictionary)
+        summary_row = pd.DataFrame([{
+            df_pdf.columns[0]: 'Total',
+            df_pdf.columns[1]: '',
+            df_pdf.columns[2]: '',
+            df_pdf.columns[3]: total_premium,
+            df_pdf.columns[4]: ''
+        }])
+        df_pdf = pd.concat([df_pdf, summary_row], ignore_index=True)
+
         num_rows = len(df_pdf)
         row_height = 0.5  # Adjust as needed
         fig_height = max(2, num_rows * row_height)
