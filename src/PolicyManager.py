@@ -526,7 +526,7 @@ class Main(QtWidgets.QDialog):
 
         num_rows = len(df_pdf)
         row_height = 0.5  # Adjust as needed
-        fig_height = max(2, num_rows * row_height)
+        fig_height = max(2, int(num_rows * row_height))
 
         fig, ax = plt.subplots(figsize=(10, fig_height)) # Adjust size as needed
         ax.axis('off') # Hide axes
