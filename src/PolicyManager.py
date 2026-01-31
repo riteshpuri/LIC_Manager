@@ -501,6 +501,7 @@ class Main(QtWidgets.QDialog):
         df_policies['NextPrePayDueDt'] = pd.to_datetime(df_policies['NextPrePayDueDt'])
         # Filter rows where date is less than today
         due_policies_df = df_policies[df_policies['NextPrePayDueDt'] < pd.Timestamp(today)]
+        due_policies_df = due_policies_df[due_policies_df['SA'] != 'Lapsed'].sort_values(by=['NextPrePayDueDt'], ascending=True)
 
         self.populate_tw_payment_due(due_policies_df)
 
