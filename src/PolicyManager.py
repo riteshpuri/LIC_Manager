@@ -280,6 +280,7 @@ class Main(QtWidgets.QDialog):
         df_search['Number'] = df_search['Number'].astype("string")
         result_df = df_search.loc[df_search['Number'] == policy_number]
         result_df.reset_index(drop=True, inplace=True)
+        self.le_paidAmount.clear()
         print(result_df)
         if len(result_df) > 0:
             self.updateBtn.setEnabled(True)
@@ -367,7 +368,6 @@ class Main(QtWidgets.QDialog):
             msgBox.exec()
 
     def populate_tw_payment_due(self, rslt_df):
-        print(rslt_df)
         if len(rslt_df) > 0:
             print(rslt_df.columns.values.tolist())
             print('searched result : {}'.format(rslt_df))
@@ -379,7 +379,7 @@ class Main(QtWidgets.QDialog):
 
             parent_items = []
             for index, row in rslt_df.iterrows():
-                print(row)
+                # print(row)
                 next_prem_due_dt = str(str(row['NextPrePayDueDt']).split(" ")[0])
                 list_item = []
 
@@ -483,7 +483,8 @@ class Main(QtWidgets.QDialog):
         date_range = pd.date_range(start=today, end=nextDate)
 
         # Filter rows where 'NextPrePayDueDt' falls within the range
-        rslt_df = df_policies[df_policies['NextPrePayDueDt'].isin(date_range)]
+        rslt_df = df_policies[df_policies['NextPrePayDueDt'].isin(date_range)].copy()
+        rslt_df = rslt_df[rslt_df['DOM'] > rslt_df['NextPrePayDueDt']]
         self.populate_tw_payment_due(rslt_df)
 
         # nextDate = nextDate.strftime('%Y-%m-%d')
@@ -502,6 +503,7 @@ class Main(QtWidgets.QDialog):
         # Filter rows where date is less than today
         due_policies_df = df_policies[df_policies['NextPrePayDueDt'] < pd.Timestamp(today)]
         due_policies_df = due_policies_df[due_policies_df['SA'] != 'Lapsed'].sort_values(by=['NextPrePayDueDt'], ascending=True)
+        due_policies_df = due_policies_df[due_policies_df['DOM'] > due_policies_df['NextPrePayDueDt']]
 
         self.populate_tw_payment_due(due_policies_df)
 
@@ -532,11 +534,14 @@ class Main(QtWidgets.QDialog):
         fig, ax = plt.subplots(figsize=(10, fig_height)) # Adjust size as needed
         ax.axis('off') # Hide axes
 
+        table_data = df_pdf.reset_index().rename(columns={'index': 'Sr No'})
+
         # Create a table from the DataFrame
-        table = ax.table(cellText=df_pdf.values, colLabels=df_pdf.columns, loc='center', cellLoc='center')
+        table = ax.table(cellText=table_data.values, colLabels=table_data.columns, loc='center', cellLoc='center')
         table.auto_set_font_size(False)
         table.set_fontsize(10)
         table.scale(1.2, 1.2) # Adjust table scale
+        #table.auto_set_column_width(col=list(range(len(table_data.columns))))
 
         # 🎨 Define colors
         header_color = '#4B8BBE'  # Strong blue
