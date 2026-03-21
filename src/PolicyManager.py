@@ -541,9 +541,14 @@ class Main(QtWidgets.QDialog):
         table.auto_set_font_size(False)
         table.set_fontsize(10)
         table.scale(1.2, 1.2) # Adjust table scale
-        #table.auto_set_column_width(col=list(range(len(table_data.columns))))
 
-        # 🎨 Define colors
+        for (row, col), cell in table.get_celld().items():
+            if col == 0:
+                cell.set_width(0.09)
+            else:
+                cell.set_width(0.21)
+
+        # Define colors
         header_color = '#4B8BBE'  # Strong blue
         even_row_color = '#E3F2FD'  # E3F2FD'   # Very light blue
         odd_row_color = '#C8E6C9'   # #BBDEFB'    # Soft medium blue
