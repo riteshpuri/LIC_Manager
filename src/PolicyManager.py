@@ -13,6 +13,8 @@ LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
 
 Frequency_dict = {'Monthly': 1, 'Quarterly': 3, 'Half Yearly': 6, 'Yearly': 12}
 
+surrendered_list = [987961243, 987961237, 987591119, 987583225, 987567519, 983795852, 983798268, 987583222]
+
 
 def close_cliked():
     print('Exiting')
@@ -485,6 +487,7 @@ class Main(QtWidgets.QDialog):
         # Filter rows where 'NextPrePayDueDt' falls within the range
         rslt_df = df_policies[df_policies['NextPrePayDueDt'].isin(date_range)].copy()
         rslt_df = rslt_df[rslt_df['DOM'] > rslt_df['NextPrePayDueDt']]
+        rslt_df = rslt_df[~rslt_df['Number'].isin(surrendered_list)]
         self.populate_tw_payment_due(rslt_df)
 
         # nextDate = nextDate.strftime('%Y-%m-%d')
@@ -504,6 +507,7 @@ class Main(QtWidgets.QDialog):
         due_policies_df = df_policies[df_policies['NextPrePayDueDt'] < pd.Timestamp(today)]
         due_policies_df = due_policies_df[due_policies_df['SA'] != 'Lapsed'].sort_values(by=['NextPrePayDueDt'], ascending=True)
         due_policies_df = due_policies_df[due_policies_df['DOM'] > due_policies_df['NextPrePayDueDt']]
+        due_policies_df = due_policies_df[~due_policies_df['Number'].isin(surrendered_list)]
 
         self.populate_tw_payment_due(due_policies_df)
 
