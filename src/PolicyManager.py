@@ -2,6 +2,8 @@ import os
 import sys
 import pandas as pd
 import datetime as datetime
+from datetime import date
+import calendar
 from tabulate import tabulate
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 from dateutil.relativedelta import relativedelta
@@ -460,6 +462,9 @@ class Main(QtWidgets.QDialog):
         isNintyDays = self.rb_nintydays.isChecked()
         isSixMonths = self.rb_sixmonths.isChecked()
         isOneYear = self.rb_oneyear.isChecked()
+        print('ritesh ....  {}'.format(self.str_date))
+        isMonthSelect = self.rb_month_select.isChecked()
+        print('ritesh .... 2 {}'.format(isMonthSelect))
         today = datetime.date.today()
         nextDate = None
 
@@ -475,8 +480,20 @@ class Main(QtWidgets.QDialog):
         elif isOneYear:
             nextDate = today + relativedelta(months=+12)
             print(nextDate)
+        elif isMonthSelect:
+            year = today.year
+            selected_month = self.cb_month.currentText()
+            month = datetime.datetime.strptime(selected_month, "%b").month
+
+            # Start date
+            today = date(year, month, 1)
+            # End date
+            last_day = calendar.monthrange(year, month)[1]
+            nextDate = date(year, month, last_day)
         else:
             print('not selected')
+
+        print('startDate: {} and end_date: {}'.format(today, nextDate))
 
         # Make sure 'NextPrePayDueDt' is datetime64
         df_policies['NextPrePayDueDt'] = pd.to_datetime(df_policies['NextPrePayDueDt'])
